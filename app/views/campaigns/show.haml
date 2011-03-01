@@ -1,9 +1,25 @@
 - if @campaign.location
   #map-col
     = render :partial => 'shared/map', :locals => { :locations => [@campaign.location], :other_locations => [], :link_type => :location, :height => MAP_HEIGHT, :width => MAP_WIDTH }
+
+/ FIXME: if this is a new campaign, offer a change to register)
+- if ! @campaign.initiator.registered
+  - form_for(@campaign.initiator, :url => account_path, :html => { :class => 'create_account_in_new_campaign' }) do |f|
+    %p Just add a password to sign up now so you can join in later... or login via FB? Why?
+    .fieldset
+      != f.hidden_field :name 
+      != f.hidden_field :email 
+      .form-field  
+        = f.label :password
+        != f.password_field :password
+      .form-field
+        = f.label :password_confirmation
+        != f.password_field :password_confirmation 
+      != f.submit t(:create_account)    
+
 .campaign-info
   / = link_to(t(:tweet_this), "http://twitter.com/share", {:class =>"twitter-share-button", 'data-count' => 'vertical', 'data-via' =>"fixmytransport"})
-  / %script{:type => "text/javascript", :src => "http://platform.twitter.com/widgets.js"}
+  / %script{:type => "text/javascript", :src => "http://platform.twitter.com/widgets.js"}  
   %h2= @campaign.title
   .details
     = t(:started_on, :date => @campaign.created_at.strftime("%d/%m/%Y"))

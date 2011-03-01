@@ -106,13 +106,13 @@ class CampaignsController < ApplicationController
     @campaign.attributes=(params[:campaign])
     if params[:user] and (params[:token] == @campaign.problem.token)
       @campaign.initiator.name = params[:user][:name]
-      @campaign.initiator.password = params[:user][:password]
-      @campaign.initiator.password_confirmation = params[:user][:password_confirmation]
-      @campaign.initiator.registered = true
+#      @campaign.initiator.password = params[:user][:password]
+#      @campaign.initiator.password_confirmation = params[:user][:password_confirmation]
+#      @campaign.initiator.registered = true
     end
     if @campaign.valid?
       @campaign.confirm
-      @campaign.save && @campaign.initiator.save
+      @campaign.save && @campaign.initiator.save #just saving the name...? FIXME
       redirect_to campaign_url(@campaign)
     else
       render :edit
