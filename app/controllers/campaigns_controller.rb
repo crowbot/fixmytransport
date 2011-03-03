@@ -103,15 +103,17 @@ class CampaignsController < ApplicationController
   end
   
   # unlike normal signup, name and email already known (not changeable) and email confirmation already done
-  # note require_campaign_initiator_or_token doesn't fit here because of the !=:new status requirement forces login(?)
   def signup_initiator
-    # TODO if password already set, redirect_to campaign_url(@campaign)
-    if params[:token] && params[:token] == @campaign.problem.token
-      @campaign.initiator.password = params[:user][:password]
-      @campaign.initiator.password_confirmation = params[:user][:password_confirmation]
-      if @campaign.initiator.save #triggers pw errors if not
-        @campaign.initiator.registered = true
-        redirect_to campaign_url(@campaign)
+    if params[:token] && params[:token] == @campaign.problem.token && ! @campaign.initiator.registered
+      if params[:user]
+        @campaign.initiator.password = params[:user][:password]
+        @campaign.initiator.password_confirmation = params[:user][:password_confirmation]
+        @campaign.initiator.registered = true # need this for pw errors
+        if @campaign.initiator.save
+          flash[:notice] = t(:signed_up_and_logged_in)       
+          redirect_to campaign_url(@campaign)
+        end
+        @campaign.initiator.registered = false # save failed, e.g., due to pw errors
       end
     else
       redirect_to campaign_url(@campaign)
@@ -120,14 +122,11 @@ class CampaignsController < ApplicationController
   
   def update
     @campaign.attributes=(params[:campaign])
-    if params[:user] and (params[:token] == @campaign.problem.token)
-      @campaign.initiator.name = params[:user][:name]
-    end
     if @campaign.valid?
       @campaign.confirm
-      @campaign.save && @campaign.initiator.save #just saving the name...? FIXME
+      @campaign.save
       if ! @campaign.initiator.registered
-        redirect_to signup_initiator_campaign_path(@campaign, :token => params[:token])
+        render :signup_initiator
       else
         redirect_to campaign_url(@campaign)
       end

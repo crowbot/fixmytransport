@@ -1,0 +1,30 @@
+/ when creating a new campaign, offer a change to register
+
+%p
+  We've created your campaign &mdash; do want want to sign up to FixMyTransport now too?
+
+.create_account_in_new_campaign
+  %p Yes, good idea!
+  - form_for(@campaign.initiator, :url => signup_initiator_campaign_url(@campaign, :token => params[:token])) do |f|
+    .fieldset
+      .form-field  
+        - if @campaign.initiator.errors.on('password')
+          .form-field-error= error_message_on @campaign.initiator, :password
+        = f.label :password
+        != f.password_field :password
+      .form-field
+        - if @campaign.initiator.errors.on('password_confirmation')
+          .form-field-error= error_message_on @campaign.initiator, :password_confirmation
+        = f.label :password_confirmation 
+        != f.password_field :password_confirmation 
+      != f.submit t(:create_account)
+
+.create_account_in_new_campaign
+  %p I'll sign in with Facebook
+  != submit_tag "sign in with facebook"
+
+%p 
+  No thanks, I'll sign up later.
+  = link_to("Continue to campaign", campaign_path(@campaign))
+    
+    

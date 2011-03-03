@@ -74,3 +74,4 @@ en:
   account_updated: "Your account has been updated."
   signup: Sign up
   successfully_confirmed_account: You have successfully confirmed your account.
+  signed_up_and_logged_in: You have successfully signed up and you are now logged in.
