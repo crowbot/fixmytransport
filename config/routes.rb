@@ -9,7 +9,8 @@ ActionController::Routing::Routes.draw do |map|
   # campaigns
   map.resources :campaigns, :except => [:destroy], 
                             :member => { :join => [:get, :post], 
-                                         :leave => [:post], 
+                                         :leave => [:post],
+                                         :signup_initiator => [:get, :put], 
                                          :add_update => [:get, :post],
                                          :add_comment => [:get, :post] } do |campaign|
     campaign.resources :incoming_messages, :only => [:show]

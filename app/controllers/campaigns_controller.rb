@@ -4,7 +4,7 @@ class CampaignsController < ApplicationController
   before_filter :find_editable_campaign, :only => [:edit, :update]
   before_filter :find_visible_campaign, :only => [:show, :join, 
                                                   :leave, :add_update, 
-                                                  :request_advice, :add_comment]
+                                                  :request_advice, :add_comment, :signup_initiator]
   before_filter :require_campaign_initiator_or_token, :only => [:edit, :update]
   before_filter :require_campaign_initiator, :only => [:add_update, :request_advice]
   before_filter :find_update, :only => [:add_comment]
@@ -102,18 +102,35 @@ class CampaignsController < ApplicationController
     end
   end
   
+  # unlike normal signup, name and email already known (not changeable) and email confirmation already done
+  # note require_campaign_initiator_or_token doesn't fit here because of the !=:new status requirement forces login(?)
+  def signup_initiator
+    # TODO if password already set, redirect_to campaign_url(@campaign)
+    if params[:token] && params[:token] == @campaign.problem.token
+      @campaign.initiator.password = params[:user][:password]
+      @campaign.initiator.password_confirmation = params[:user][:password_confirmation]
+      if @campaign.initiator.save #triggers pw errors if not
+        @campaign.initiator.registered = true
+        redirect_to campaign_url(@campaign)
+      end
+    else
+      redirect_to campaign_url(@campaign)
+    end
+  end
+  
   def update
     @campaign.attributes=(params[:campaign])
     if params[:user] and (params[:token] == @campaign.problem.token)
       @campaign.initiator.name = params[:user][:name]
-#      @campaign.initiator.password = params[:user][:password]
-#      @campaign.initiator.password_confirmation = params[:user][:password_confirmation]
-#      @campaign.initiator.registered = true
     end
     if @campaign.valid?
       @campaign.confirm
       @campaign.save && @campaign.initiator.save #just saving the name...? FIXME
-      redirect_to campaign_url(@campaign)
+      if ! @campaign.initiator.registered
+        redirect_to signup_initiator_campaign_path(@campaign, :token => params[:token])
+      else
+        redirect_to campaign_url(@campaign)
+      end
     else
       render :edit
     end
