@@ -5,7 +5,7 @@
 
 .create_account_in_new_campaign
   %p Yes, good idea!
-  - form_for(@campaign.initiator, :url => signup_initiator_campaign_url(@campaign, :token => params[:token])) do |f|
+  - form_for(@campaign.initiator, :url => signup_initiator_campaign_url(@campaign, :token => params[:token]), :html => { :class => "signup_initiator" }) do |f|
     .fieldset
       .form-field  
         - if @campaign.initiator.errors.on('password')
@@ -20,7 +20,7 @@
       != f.submit t(:create_account)
 
 .create_account_in_new_campaign
-  %p I'll sign in with Facebook
+  %p Yes, but I'll sign in with my Facebook account.
   != submit_tag "sign in with facebook"
 
 %p 

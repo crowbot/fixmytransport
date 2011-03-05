@@ -857,12 +857,15 @@ div.submit{
   float: right;  
 }
 
-.create_account_in_new_campaign {
+.create_account_in_new_campaign , .facebook_in_new_campaign{
     border:1px solid #cccccc;
-    font-size: 0.8em;
     max-width: 50%;
     padding: 0 1em 0.5em 1em;
     margin-bottom: 1em;
+}
+
+.create_account_in_new_campaign .signup_initiator label {
+    width: 12em;
 }
 
 /* Updating account */ 
